@@ -1,6 +1,8 @@
 # isthereanydeal_flask
 This is the machine learning model using the Video Game Sales History dataset, deployed in Flask, which shows if there will be a video game sale in the next few days
 
+**View the data prep work:** https://github.com/neilnguyen123/Video-Game-Sales-Price-History
+
 # Demo
 View of website form
 <img width="1086" alt="Screen Shot 2021-12-18 at 9 47 28 PM" src="https://user-images.githubusercontent.com/85441922/146663203-217e9876-9b2c-46a8-8236-4b7510e68d18.png">
