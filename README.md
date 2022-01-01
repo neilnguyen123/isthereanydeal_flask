@@ -22,17 +22,14 @@ View prediction results
 # Setup & Installation
 Install the latest version of Python
 ```
-git clone <https://github.com/neilnguyen123/isthereanydeal_flask>
+git clone https://github.com/neilnguyen123/isthereanydeal_flask
 ```
 ```
-cd <isthereanydeal_flask>
+cd isthereanydeal_flask
 ```
 ```
 pip install -r requirements.txt
 ```
-
-Download the CSV file and save it in the same folder this repo was cloned in: 
-https://drive.google.com/file/d/1NyA7MIcM_gVnARyYsy4pFWdpPQojXIK3/view?usp=sharing
 
 # Running the app
 ```
