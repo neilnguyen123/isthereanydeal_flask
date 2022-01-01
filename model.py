@@ -2,36 +2,22 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
-from sklearn.preprocessing import StandardScaler
 from sklearn import metrics
 import datetime
+from bs4_scrape import Scrape
+import pipeline
 
 def classify(game_title_input):
-    # game_store = 'Steam'
+    today = pd.to_datetime(pd.datetime.today()).floor('D').strftime("%m/%d/%Y")
 
-    df_hist_merge_1 = pd.read_csv('df_hist_merge.csv')
-
-    df_hist_merge_1 = df_hist_merge_1.set_index('Unnamed: 0')
-    df_hist_merge_1['game_date'] = pd.to_datetime(df_hist_merge_1.game_date)
-
-    df_game = df_hist_merge_1.loc[(df_hist_merge_1.stores_title == game_title_input)]
-    sales_game = df_game.groupby('game_date')['stores_title'].count().reset_index()
-
-    dates = pd.date_range(sales_game.game_date.min(), df_hist_merge_1.game_date.max(), name='game_date').date
-
-    sales_game = sales_game.set_index('game_date').reindex(dates)
-    sales_game = sales_game.asfreq('D')
-
-    # Replace any non-sales day with a 0
-    sales_game['stores_title'] = np.where(sales_game.stores_title.isnull() == True,
-                                          0,
-                                          1)
+    df_final = pipeline.df_pipe(Scrape.scrape(game_title_input))
+    # Create column to determine if sales or not
+    df_final['sale'] = np.where(df_final.sale_duration.isnull() == True, 0, 1)
 
     # Create values
-    sales_game = sales_game.reset_index()
-    x = sales_game.index.values
-    y = sales_game.stores_title.values
+    df_final = df_final.reset_index()
+    x = df_final.index.values
+    y = df_final.sale.values
 
     # Test train split
     x_train, x_test, y_train, y_test = train_test_split(x,
@@ -46,25 +32,27 @@ def classify(game_title_input):
     # Create predictions from model
     y_pred = model.predict(x_test.reshape(-1, 1))
 
-
-    # Apply predictions over next 30 days
-    # Create next 30 days
-    predict_30 = pd.date_range(df_hist_merge_1.game_date.max() + datetime.timedelta(days=1),
-                               df_hist_merge_1.game_date.max() + datetime.timedelta(days=30))
-    df_predict_30 = pd.DataFrame({'game_date': predict_30})
+    # Make prediction over next 5 days
+    predict_5 = pd.date_range(df_final.game_date.max() + datetime.timedelta(days=1),
+                              df_final.game_date.max() + datetime.timedelta(days=5))
+    df_predict_5 = pd.DataFrame({'game_date': predict_5})
 
     # Apply model
-    sale_game_next = sales_game.append(df_predict_30).reset_index().drop('index', axis=1)
-    pred_30 = sale_game_next.iloc[-len(predict_30):].index.values.reshape(-1, 1)
-    next_pred = model.predict(pred_30)
+    sale_game_next = df_final.append(df_predict_5).reset_index().drop('index', axis=1)
+    pred_5 = sale_game_next.iloc[-len(predict_5):].index.values.reshape(-1, 1)
+    next_pred = model.predict(pred_5)
 
     # Insert predictions to df
-    df_predict_30['pred'] = next_pred
+    df_predict_5['pred'] = next_pred
 
     # Make statement
-    if df_predict_30.loc[df_predict_30.pred == 1]['game_date'].shape[0] > 0:
-        result = "There may be a sale for " + game_title_input + " over the next 30 days. This model has a " + str(round(metrics.accuracy_score(y_test, y_pred), 2)*100) + "% accuracy."
+    if df_predict_5.loc[df_predict_5.pred == 1]['game_date'].shape[0] > 0:
+        result = f"As of {today}, there may be a sale for {game_title_input} in the next 5 days on Steam. This model has a " + str(
+            round(metrics.accuracy_score(y_test, y_pred), 2) * 100) + "% accuracy."
     else:
-        result = "There may NOT be a sale for " + game_title_input + " over the next 30 days. This model has a " + str(round(metrics.accuracy_score(y_test, y_pred), 2)*100) + "% accuracy."
+        result = f"As of {today}, there may be no sales for {game_title_input} in the next 5 days on Steam. This model has a " + str(
+            round(metrics.accuracy_score(y_test, y_pred), 2) * 100) + "% accuracy."
 
     return result
+
+# classify("The Elder Scrolls V: Skyrim")
