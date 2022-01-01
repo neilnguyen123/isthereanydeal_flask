@@ -21,14 +21,19 @@ View prediction results
 
 # Setup & Installation
 
-Mac OS Users
+Ensure git is installed
+If not, download here and use recommended settings: https://git-scm.com/download/win
+
 Install the latest version of Python
+Clone repo
 ```
 git clone https://github.com/neilnguyen123/isthereanydeal_flask
 ```
+Set the repo as path
 ```
 cd isthereanydeal_flask
 ```
+Install required packages
 ```
 pip install -r requirements.txt
 ```
