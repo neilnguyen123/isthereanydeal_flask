@@ -20,6 +20,8 @@ View prediction results
 
 
 # Setup & Installation
+
+Mac OS Users
 Install the latest version of Python
 ```
 git clone https://github.com/neilnguyen123/isthereanydeal_flask
@@ -30,11 +32,21 @@ cd isthereanydeal_flask
 ```
 pip install -r requirements.txt
 ```
+or
+```
+py -m pip install -r requirements.txt
+```
+
 
 # Running the app
 ```
 python server.py
 ```
+or
+```
+py server.py
+```
+
 # Viewing the app
 
 Go to http://127.0.0.1:5000/home
